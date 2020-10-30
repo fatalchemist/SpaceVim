@@ -1,6 +1,6 @@
 "=============================================================================
 " python.vim --- SpaceVim lang#python layer
-" Copyright (c) 2016-2019 Wang Shidong & Contributors
+" Copyright (c) 2016-2020 Wang Shidong & Contributors
 " Author: Wang Shidong < wsdjeg at 163.com >
 " URL: https://spacevim.org
 " License: GPLv3
@@ -138,20 +138,25 @@ function! s:language_specified_mappings() abort
 
   " Format on save
   if s:format_on_save
-    augroup SpaceVim_layer_lang_python
-      autocmd!
-      autocmd BufWritePost *.py Neoformat yapf
-    augroup end
+    call SpaceVim#layers#format#add_filetype({
+          \ 'filetype' : 'python',
+          \ 'enable' : 1,
+          \ })
   endif
 
+endfunction
+
+
+function! s:Shebang_to_cmd(line) abort
+  let executable = matchstr(a:line, '#!\s*\zs[^ ]*')
+  let argvs = split(matchstr(a:line, '#!\s*[^ ]\+\s*\zs.*'))
+  return [executable] + argvs
 endfunction
 
 func! s:getexe() abort
   let line = getline(1)
   if line =~# '^#!'
-    let exe = split(line)
-    let exe[0] = exe[0][2:]
-    return exe
+    return s:Shebang_to_cmd(line)
   endif
   return ['python']
 endf

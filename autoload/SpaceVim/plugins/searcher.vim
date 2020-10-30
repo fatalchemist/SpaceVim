@@ -1,6 +1,6 @@
 "=============================================================================
 " searcher.vim --- project searcher for SpaceVim
-" Copyright (c) 2016-2019 Wang Shidong & Contributors
+" Copyright (c) 2016-2020 Wang Shidong & Contributors
 " Author: Wang Shidong < wsdjeg at 163.com >
 " URL: https://spacevim.org
 " License: GPLv3
@@ -26,7 +26,7 @@ function! SpaceVim#plugins#searcher#find(expr, exe) abort
         \ })
   if id > 0
     echohl Comment
-    echo 'seraching: ' . expr
+    echo 'searching: ' . expr
     echohl None
   endif
 endfunction

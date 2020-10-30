@@ -1,6 +1,6 @@
 "=============================================================================
 " java.vim --- SpaceVim lang#java layer
-" Copyright (c) 2016-2019 Wang Shidong & Contributors
+" Copyright (c) 2016-2020 Wang Shidong & Contributors
 " Author: Wang Shidong < wsdjeg at 163.com >
 " URL: https://spacevim.org
 " License: GPLv3
@@ -60,8 +60,9 @@
 "
 "   Mode      Key           Function
 "   -------------------------------------------------------------
-"   normal    SPC l g b     run gradle clean build
-"   normal    SPC l g B     run gradle build
+"   normal    SPC l g r     run gradle run 
+"   normal    SPC l g b     run gradle build
+"   normal    SPC l g B     run gradle clean build
 "   normal    SPC l g t     run gradle test
 "
 "   Jump key bindings:
@@ -102,16 +103,21 @@ function! SpaceVim#layers#lang#java#config() abort
   call SpaceVim#mapping#space#regesit_lang_mappings('java', function('s:language_specified_mappings'))
   call SpaceVim#plugins#repl#reg('java', 'jshell')
   call add(g:spacevim_project_rooter_patterns, 'pom.xml')
+
+  if SpaceVim#layers#lsp#check_filetype('java')
+    call SpaceVim#mapping#gd#add('java', function('SpaceVim#lsp#go_to_def'))
+  else
+    call SpaceVim#mapping#gd#add('java', function('s:go_to_def'))
+  endif
   augroup SpaceVim_lang_java
     au!
     if !SpaceVim#layers#lsp#check_filetype('java')
       " omnifunc will be used only when no java lsp support
       autocmd FileType java setlocal omnifunc=javacomplete#Complete
-      call SpaceVim#mapping#gd#add('java', function('s:go_to_def'))
     endif
     autocmd FileType jsp call <SID>JspFileTypeInit()
   augroup END
-  let g:neoformat_enabled_java = ['googlefmt']
+  let g:neoformat_enabled_java = get(g:, 'neoformat_enabled_java', ['googlefmt'])
   let g:neoformat_java_googlefmt = {
         \ 'exe': 'java',
         \ 'args': ['-jar', get(g:,'spacevim_layer_lang_java_formatter', ''), '-'],
@@ -189,6 +195,9 @@ function! s:language_specified_mappings() abort
   call SpaceVim#mapping#space#langSPC('nmap', ['l', 'g', 't'],
         \ '<Plug>(JavaComplete-Generate-ToString)',
         \ 'Generate toString function', 0)
+  call SpaceVim#mapping#space#langSPC('nmap', ['l', 'g', 'n'],
+        \ '<Plug>(JavaComplete-Generate-NewClass)',
+        \ 'Generate NewClass in current Package', 0)
 
   " Jump
   let g:_spacevim_mappings_space.l.j = {'name' : '+Jump'}
@@ -231,15 +240,20 @@ function! s:language_specified_mappings() abort
 
   " Gradle
   let g:_spacevim_mappings_space.l.g = {'name' : '+Gradle'}
-  call SpaceVim#mapping#space#langSPC('nnoremap', ['l','g', 'b'], 'call call('
+  call SpaceVim#mapping#space#langSPC('nnoremap', ['l','g', 'B'], 'call call('
         \ . string(function('s:execCMD')) . ', ["gradle clean build"])',
         \ 'Run gradle clean build', 1)
-  call SpaceVim#mapping#space#langSPC('nnoremap', ['l','g', 'B'], 'call call('
+  call SpaceVim#mapping#space#langSPC('nnoremap', ['l','g', 'b'], 'call call('
         \ . string(function('s:execCMD')) . ', ["gradle build"])',
         \ 'Run gradle build', 1)
   call SpaceVim#mapping#space#langSPC('nnoremap', ['l','g', 't'], 'call call('
         \ . string(function('s:execCMD')) . ', ["gradle test"])',
         \ 'Run gradle test', 1)
+  call SpaceVim#mapping#space#langSPC('nnoremap', ['l','g', 'r'], 'call call('
+        \ . string(function('s:execCMD')) . ', ["gradle run"])',
+        \ 'Run gradle run', 1)
+
+  " REPL
   let g:_spacevim_mappings_space.l.s = {'name' : '+Send'}
   call SpaceVim#mapping#space#langSPC('nmap', ['l','s', 'i'],
         \ 'call SpaceVim#plugins#repl#start("java")',
@@ -269,7 +283,7 @@ function! s:java_mappings() abort
 endfunction
 
 function! s:go_to_def() abort
-  call SpaceVim#lsp#go_to_def()
+  exe 'normal! gd'
 endfunction
 
 function! s:execCMD(cmd) abort

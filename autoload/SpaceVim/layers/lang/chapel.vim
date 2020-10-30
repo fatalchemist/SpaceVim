@@ -1,11 +1,28 @@
 "=============================================================================
 " chapel.vim --- chapel language support
-" Copyright (c) 2016-2019 Wang Shidong & Contributors
+" Copyright (c) 2016-2020 Wang Shidong & Contributors
 " Author: Wang Shidong < wsdjeg@outlook.com >
 " URL: https://spacevim.org
 " License: GPLv3
 "=============================================================================
 
+""
+" @section lang#chapel, layer-lang-chapel
+" @parentsection layers
+" This layer is for chapel development, disabled by default, to enable this
+" layer, add following snippet to your SpaceVim configuration file.
+" >
+"   [[layers]]
+"     name = 'lang#chapel'
+" <
+"
+" @subsection Key bindings
+" >
+"   Mode            Key             Function
+"   ---------------------------------------------
+"   normal          SPC l r         compile and run current file
+" <
+"
 
 function! SpaceVim#layers#lang#chapel#plugins() abort
   let plugins = []

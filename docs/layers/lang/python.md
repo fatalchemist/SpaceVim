@@ -72,6 +72,18 @@ load this layer with setting `format_on_save` to `1`.
 pip install --user yapf
 ```
 
+To use other tool as the format command, for example `black`, change the neoformat option in bootstrap
+function.
+
+```viml
+let g:neoformat_python_black = {
+    \ 'exe': 'black',
+    \ 'stdin': 1,
+    \ 'args': ['-q', '-'],
+    \ }
+let g:neoformat_enabled_python = ['black']
+```
+
 **format imports:**
 
 To be able to suppress unused imports easily, install [autoflake](https://github.com/myint/autoflake):
@@ -117,6 +129,15 @@ is disabled, because it is too slow. To enable type info:
 [[layers]]
   name = "lang#python"
   enable_typeinfo = true
+```
+
+By default, the python layer utilizes `neomake` for syntax checking, and the default python executable
+is simply `python`. Note that the python version is up to your system configuration. If the system
+(or environment) python version is 2, one can have the following configuration in the bootstrap function
+for syntax checking on python3:
+
+```vim
+let g:neomake_python_python_exe = 'python3'
 ```
 
 ## Key bindings
